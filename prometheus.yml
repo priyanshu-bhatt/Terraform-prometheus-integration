@@ -1,0 +1,26 @@
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "LinuxNode1"
+    file_sd_configs:
+    - files:
+      - myservicediscover.yml
+    relabel_configs:
+      - source_labels: [env]
+        regex: "prod"
+        replacement: "QATeam"
+        target_label: env
+
+  - job_name: "myec2"
+    ec2_sd_configs: 
+      - access_key: AKIAY7XJTDTXTAKHO7WE
+        secret_key: rBv4eR4vgRUksRyCftLSvuIIaNOl9QbvwKqk3tkL
+        region: ap-south-1
+    relabel_configs:
+      - source_labels: [__meta_ec2_public_ip]
+        regex: "(.*)"
+        replacement: "${1}:9100"
+        target_label: __address__
